@@ -1,6 +1,7 @@
 import streamlit as st
 import yt_dlp
 import os
+from pathlib import Path
 
 st.title('YouTube Video Downloader For Assam Mamaya')
 
@@ -10,23 +11,23 @@ link = st.text_input('Enter YouTube video link:')
 if st.button('Download'):
     if link:
         try:
-            # Define the save path to the "Downloads" folder
-            folder_path = os.path.expanduser("~/Downloads")
+            # Get the path to the user's Downloads folder
+            path_to_download_folder = str(os.path.join(Path.home(), "Downloads"))
             
             # Ensure the save path exists
-            if not os.path.exists(folder_path):
-                os.makedirs(folder_path)
+            if not os.path.exists(path_to_download_folder):
+                os.makedirs(path_to_download_folder)
             
             st.write(f"Downloading video from: {link}")
             
             ydl_opts = {
-                'outtmpl': os.path.join(folder_path, '%(title)s.%(ext)s'),
+                'outtmpl': os.path.join(path_to_download_folder, '%(title)s.%(ext)s'),
                 'format': 'mp4'
             }
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([link])
             
-            st.success(f'Video downloaded successfully to {folder_path}!')
+            st.success(f'Video downloaded successfully to {path_to_download_folder}!')
         except Exception as e:
             st.error(f"Error while downloading the video: {e}")
     else:
@@ -34,9 +35,9 @@ if st.button('Download'):
 
 # Display the downloaded videos
 st.header('Downloaded Videos')
-folder_path = os.path.expanduser("~/Downloads")
-if os.path.exists(folder_path):
-    videos = os.listdir(folder_path)
+path_to_download_folder = str(os.path.join(Path.home(), "Downloads"))
+if os.path.exists(path_to_download_folder):
+    videos = os.listdir(path_to_download_folder)
     for video in videos:
         st.write(video)
 else:
